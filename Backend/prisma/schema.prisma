@@ -1,0 +1,673 @@
+// ============================================================================
+// Prisma Schema — Marketplace Barang Bekas dengan Sistem Escrow
+// ============================================================================
+// Konvensi:
+// - Semua primary key menggunakan UUID (String, default uuid()).
+// - Semua tabel punya createdAt & updatedAt untuk audit trail dasar.
+// - Enum digunakan untuk semua field status agar konsisten di seluruh layer.
+// - Foreign key dengan onDelete eksplisit (Restrict / Cascade / SetNull)
+//   dipilih sesuai semantik bisnis, bukan default Prisma.
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum ProductCondition {
+  NEW
+  LIKE_NEW
+  USED_GOOD
+  USED_FAIR
+}
+
+enum ProductStatus {
+  ACTIVE
+  PENDING
+  SOLD
+  REMOVED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  DISPUTED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  E_WALLET
+  CREDIT_CARD
+  QRIS
+  OTHER
+}
+
+enum EscrowStatus {
+  HOLDING
+  RELEASED
+  REFUNDED
+  DISPUTED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_BUYER
+  RESOLVED_SELLER
+  CLOSED
+}
+
+enum NotificationType {
+  PRODUCT_SOLD
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+  ITEM_SHIPPED
+  ITEM_DELIVERED
+  DISPUTE_OPENED
+  DISPUTE_RESOLVED
+  REFUND_SUCCESS
+  WITHDRAWAL_PROCESSED
+  CHAT_MESSAGE
+  SYSTEM
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWED
+  ACTION_TAKEN
+  DISMISSED
+}
+
+enum ReportTargetType {
+  USER
+  PRODUCT
+}
+
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  // Catatan: SYSTEM tidak dijadikan messageType terpisah karena sudah
+  // direpresentasikan oleh flag isSystemMessage pada ChatMessage — ini
+  // menghindari percabangan ganda (messageType vs isSystemMessage) yang
+  // membingungkan saat keduanya harus dicek bersamaan di frontend.
+  // Tipe masa depan (VOICE, VIDEO_CALL_LOG, dst.) ditambahkan di sini saja
+  // tanpa mengubah struktur tabel.
+}
+
+// ============================================================================
+// USER & AUTH
+// ============================================================================
+
+model User {
+  id           String     @id @default(uuid())
+  name         String
+  email        String     @unique
+  passwordHash String?    // nullable: user yang daftar via Google tidak punya password lokal
+  phone        String?
+  role         UserRole   @default(BUYER)
+  status       UserStatus @default(ACTIVE)
+  avatarUrl    String?
+  googleId     String?    @unique
+
+  isEmailVerified Boolean @default(false)
+
+  // Rating agregat (denormalized untuk performa, dihitung ulang dari Rating)
+  ratingAverage Float @default(0)
+  ratingCount   Int   @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  addresses          Address[]
+  products           Product[]
+  wishlists          Wishlist[]
+  followingSellers   Follow[]            @relation("FollowerRelation")
+  followedBySellers  Follow[]            @relation("SellingRelation")
+  ordersAsBuyer      Order[]             @relation("BuyerOrders")
+  reviewsWritten     Review[]            @relation("ReviewAuthor")
+  reviewsReceived    Review[]            @relation("ReviewTarget")
+  ratingsGiven       Rating[]            @relation("RatingAuthor")
+  ratingsReceived    Rating[]            @relation("RatingTarget")
+  chatRoomsAsBuyer   ChatRoom[]          @relation("ChatBuyer")
+  chatRoomsAsSeller  ChatRoom[]          @relation("ChatSeller")
+  chatMessagesSent   ChatMessage[]
+  notifications      Notification[]
+  reportsMade        Report[]            @relation("ReportAuthor")
+  reportsReceived    Report[]            @relation("ReportedUser")
+  disputesRaised     Dispute[]           @relation("DisputeRaisedBy")
+  refreshTokens      RefreshToken[]
+  sessions           Session[]
+  auditLogs          AuditLog[]
+  wallet             Wallet?
+  withdrawals        Withdrawal[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  replacedByToken String?
+  createdAt DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+
+  @@index([userId])
+}
+
+model Session {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent  String?
+  ipAddress  String?
+  lastActive DateTime @default(now())
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Address {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label        String   // contoh: "Rumah", "Kantor"
+  recipientName String
+  phone        String
+  fullAddress  String
+  city         String
+  province     String
+  postalCode   String
+  isDefault    Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([userId])
+}
+
+// ============================================================================
+// PRODUCT & CATALOG
+// ============================================================================
+
+model Category {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  slug      String     @unique
+  iconUrl   String?
+  parentId  String?
+  parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children  Category[] @relation("CategoryHierarchy")
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
+}
+
+model Product {
+  id          String           @id @default(uuid())
+  sellerId    String
+  seller      User             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  categoryId  String
+  category    Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  title       String
+  slug        String           @unique
+  description String
+  price       Decimal          @db.Decimal(12, 2)
+  condition   ProductCondition
+  status      ProductStatus    @default(ACTIVE)
+
+  city        String
+  province    String?
+  latitude    Float?
+  longitude   Float?
+
+  viewCount   Int              @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  images     ProductImage[]
+  wishlists  Wishlist[]
+  orderItems OrderItem[]
+  reports    Report[]
+  chatRooms  ChatRoom[]
+
+  @@index([sellerId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([city])
+  @@index([price])
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  publicId  String   // Cloudinary public_id, dipakai untuk hapus aset saat produk dihapus
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([productId])
+}
+
+model Follow {
+  id         String   @id @default(uuid())
+  followerId String
+  follower   User     @relation("FollowerRelation", fields: [followerId], references: [id], onDelete: Cascade)
+  sellerId   String
+  seller     User     @relation("SellingRelation", fields: [sellerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([followerId, sellerId])
+  @@index([sellerId])
+}
+
+// ============================================================================
+// ORDER & TRANSACTION
+// ============================================================================
+
+model Order {
+  id            String      @id @default(uuid())
+  orderNumber   String      @unique // contoh: ORD-20260626-XXXXXX, untuk ditampilkan ke user
+  buyerId       String
+  buyer         User        @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Restrict)
+  addressId     String
+  address       Address     @relation(fields: [addressId], references: [id], onDelete: Restrict)
+
+  status        OrderStatus @default(PENDING_PAYMENT)
+
+  subtotal      Decimal     @db.Decimal(12, 2)
+  shippingFee   Decimal     @db.Decimal(12, 2) @default(0)
+  adminFee      Decimal     @db.Decimal(12, 2) @default(0)
+  totalAmount   Decimal     @db.Decimal(12, 2)
+
+  shippedAt     DateTime?
+  deliveredAt   DateTime?
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items    OrderItem[]
+  payment  Payment?
+  escrow   Escrow?
+  dispute  Dispute?
+  reviews  Review[]
+  notifications Notification[]
+  chatMessages  ChatMessage[]
+
+  @@index([buyerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  // Snapshot harga & judul saat transaksi terjadi, agar histori tidak berubah
+  // walau produk diedit/dihapus setelah order dibuat.
+  titleSnapshot String
+  priceSnapshot Decimal @db.Decimal(12, 2)
+  quantity      Int     @default(1)
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// ============================================================================
+// PAYMENT & ESCROW
+// ============================================================================
+
+model Payment {
+  id              String        @id @default(uuid())
+  orderId         String        @unique
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  midtransOrderId String        @unique // ID yang dikirim ke Midtrans, biasanya = orderNumber
+  transactionId   String?       // transaction_id dari respons/webhook Midtrans
+  method          PaymentMethod?
+  status          PaymentStatus @default(PENDING)
+  amount          Decimal       @db.Decimal(12, 2)
+
+  paidAt          DateTime?
+  expiredAt       DateTime?
+
+  rawWebhookPayload Json?       // simpan payload webhook terakhir untuk audit/debug
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([midtransOrderId])
+  @@index([status])
+}
+
+model Escrow {
+  id          String       @id @default(uuid())
+  orderId     String       @unique
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  amount      Decimal      @db.Decimal(12, 2)
+  status      EscrowStatus @default(HOLDING)
+
+  heldAt      DateTime     @default(now())
+  releasedAt  DateTime?
+  refundedAt  DateTime?
+
+  // Diisi oleh admin jika pelepasan/refund terjadi akibat keputusan dispute
+  resolvedByAdminId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance   Decimal  @db.Decimal(12, 2) @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  withdrawals Withdrawal[]
+}
+
+model Withdrawal {
+  id        String           @id @default(uuid())
+  walletId  String
+  wallet    Wallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount    Decimal          @db.Decimal(12, 2)
+  status    WithdrawalStatus @default(PENDING)
+
+  bankName      String
+  bankAccountNo String
+  accountHolder String
+
+  processedAt DateTime?
+  rejectedReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ============================================================================
+// DISPUTE
+// ============================================================================
+
+model Dispute {
+  id            String        @id @default(uuid())
+  orderId       String        @unique
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  raisedById    String
+  raisedBy      User          @relation("DisputeRaisedBy", fields: [raisedById], references: [id], onDelete: Cascade)
+
+  reason        String
+  evidenceUrls  String[]      // bukti foto/screenshot, disimpan sebagai array URL Cloudinary
+  status        DisputeStatus @default(OPEN)
+
+  adminNote     String?
+  resolvedAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// ============================================================================
+// REVIEW & RATING
+// ============================================================================
+
+model Review {
+  id         String   @id @default(uuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  targetId   String
+  target     User     @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  comment    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orderId, authorId])
+  @@index([targetId])
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  authorId  String
+  author    User     @relation("RatingAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  targetId  String
+  target    User     @relation("RatingTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  orderId   String   @unique
+  score     Int      // 1-5
+
+  createdAt DateTime @default(now())
+
+  @@index([targetId])
+}
+
+// ============================================================================
+// CHAT
+// ============================================================================
+
+model ChatRoom {
+  id        String   @id @default(uuid())
+  buyerId   String
+  buyer     User     @relation("ChatBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId  String
+  seller    User     @relation("ChatSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  // Denormalized untuk conversation list (hindari query agregat berat tiap
+  // render daftar chat). Diupdate setiap kali pesan baru dibuat.
+  lastMessage   String?
+  lastMessageAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages ChatMessage[]
+
+  @@unique([buyerId, sellerId, productId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([lastMessageAt])
+}
+
+model ChatMessage {
+  id         String      @id @default(uuid())
+  chatRoomId String
+  chatRoom   ChatRoom    @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  senderId   String
+  sender     User        @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  // Opsional: menandai pesan ini terkait order tertentu (misal pembeli nanya
+  // status pengiriman order spesifik di room yang sama dengan nego sebelumnya).
+  orderId    String?
+  order      Order?      @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  messageType MessageType @default(TEXT)
+  content    String       // untuk TEXT: isi pesan (sudah disanitasi). Untuk IMAGE: caption opsional, boleh kosong.
+  imageUrl   String?      // hanya terisi jika messageType = IMAGE
+  isRead     Boolean      @default(false)
+
+  // True untuk pesan otomatis dari sistem, contoh: "Order #ORD-xxx telah dibuat",
+  // "Pembayaran berhasil diterima". Ditampilkan beda secara visual di frontend.
+  isSystemMessage Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([chatRoomId])
+  @@index([senderId])
+  @@index([orderId])
+}
+
+// ============================================================================
+// NOTIFICATION
+// ============================================================================
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  orderId   String?
+  order     Order?           @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  isRead    Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+// ============================================================================
+// REPORT (moderasi konten/user)
+// ============================================================================
+
+model Report {
+  id             String           @id @default(uuid())
+  reporterId     String
+  reporter       User             @relation("ReportAuthor", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  targetType     ReportTargetType
+  reportedUserId String?
+  reportedUser   User?            @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  productId      String?
+  product        Product?         @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  reason         String
+  status         ReportStatus     @default(OPEN)
+  adminNote      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([reportedUserId])
+  @@index([productId])
+}
+
+// ============================================================================
+// AUDIT LOG
+// ============================================================================
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  // nullable: aksi sistem otomatis (cron, webhook) tidak punya userId
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  action    String   // contoh: "USER_SUSPENDED", "ESCROW_RELEASED", "DISPUTE_RESOLVED"
+  entity    String   // contoh: "User", "Order", "Escrow"
+  entityId  String?
+
+  metadata  Json?    // detail tambahan, misal { "previousStatus": "...", "newStatus": "..." }
+  ipAddress String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([action])
+}

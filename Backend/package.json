@@ -1,0 +1,34 @@
+{
+  "name": "jual-bekas",
+  "version": "1.0.0",
+  "description": "Marketplace jual-beli barang bekas dengan sistem rekening bersama (escrow) — dana pembeli ditahan sistem hingga barang dikonfirmasi diterima, baru diteruskan ke penjual.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "tsx watch server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.0.1",
+    "prisma": "^7.8.0",
+    "tsx": "^4.22.4"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.8.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "socket.io": "^4.8.3"
+  }
+}
