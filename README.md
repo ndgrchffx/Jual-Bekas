@@ -6,22 +6,22 @@ Marketplace jual-beli barang bekas dengan sistem rekening bersama (escrow) — d
 
 Project ini dibangun bertahap. Status saat ini:
 
-- [x] Struktur folder backend (modular: controllers, services, routes, middlewares, dll.)
-- [x] Prisma schema lengkap (24 model, 14 enum, relasi & index)
+- [x] Struktur folder backend (modular)
+- [x] Prisma schema lengkap (24 model, 14 enum)
 - [x] `.env.example` & validasi environment variables
-- [x] Modul Auth (register, login, refresh token rotation, logout, forgot/reset password, change password)
-- [x] Modul Chat realtime (Socket.IO: join_room, send_message, typing, mark_as_read; REST: conversation list, history)
-- [ ] Hardening security lanjutan (account lockout, CAPTCHA Cloudflare Turnstile, email verification, security dashboard admin)
-- [ ] Google OAuth (opsional, struktur sudah disiapkan di routes)
-- [ ] Modul Product & Catalog
-- [ ] Modul Order & Escrow flow
+- [x] Modul Auth (register, login, refresh token rotation, logout, forgot/reset password)
+- [x] Modul Chat realtime (Socket.IO + REST)
+- [x] Modul Product & Upload (CRUD produk, multi-foto Cloudinary, validasi MIME/size/UUID)
+- [x] Modul Marketplace (search/filter/sort, wishlist, follow seller, category list)
+- [x] Seed kategori produk (7 parent, 30+ subcategory)
+- [ ] Hardening security (account lockout, CAPTCHA Cloudflare Turnstile, email verification)
+- [ ] Modul Order + Escrow flow
 - [ ] Integrasi Payment (Midtrans sandbox)
-- [ ] Modul Notification
+- [ ] Modul Notification (Socket.IO push)
 - [ ] Modul Admin & Dispute resolution
 - [ ] Frontend (Next.js)
-- [ ] Docker Compose (Postgres, Redis, backend, frontend)
-- [ ] API Documentation
-- [ ] ERD & flowchart transaksi
+- [ ] Docker Compose
+- [ ] API Documentation & ERD
 
 ## Tech Stack
 
