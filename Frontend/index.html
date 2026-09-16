@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rancangan UI — Marketplace Barang Bekas (Escrow)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="proto">
+  <div class="proto-inner">
+    <span class="proto-label">JualBeliBekas</span>
+    <div class="proto-tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-go="beranda">Beranda</button>
+      <button role="tab" aria-selected="false" data-go="produk">Detail produk</button>
+      <button role="tab" aria-selected="false" data-go="checkout">Checkout</button>
+      <button role="tab" aria-selected="false" data-go="pesanan">Pesanan &amp; escrow</button>
+      <button role="tab" aria-selected="false" data-go="chat">Chat</button>
+      <button role="tab" aria-selected="false" data-go="dompet">Dompet penjual</button>
+      <button role="tab" aria-selected="false" data-go="sengketa">Admin — sengketa</button>
+    </div>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">JBB<span>.id</span></div>
+    <div class="search">
+      <input type="text" placeholder="Cari kamera, sepeda, laptop…" aria-label="Cari barang">
+      <button type="button">Cari</button>
+    </div>
+    <nav class="topnav">
+      <span>Jual barang</span>
+      <span>Pesanan</span>
+      <span>Chat<i class="dot"></i></span>
+      <span>Rani</span>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= BERANDA ================= -->
+<section class="screen on" id="beranda">
+  <div class="wrap">
+    <div class="cats" role="group" aria-label="Kategori">
+      <button aria-pressed="true">Semua</button>
+      <button aria-pressed="false">Elektronik</button>
+      <button aria-pressed="false">Fotografi</button>
+      <button aria-pressed="false">Sepeda &amp; olahraga</button>
+      <button aria-pressed="false">Fashion</button>
+      <button aria-pressed="false">Rumah tangga</button>
+      <button aria-pressed="false">Hobi &amp; koleksi</button>
+      <button aria-pressed="false">Otomotif</button>
+    </div>
+
+    <div class="browse">
+      <aside class="filter stack">
+        <div>
+          <h3>Harga</h3>
+          <div class="row">
+            <input type="text" placeholder="Rp min" aria-label="Harga minimum">
+            <input type="text" placeholder="Rp maks" aria-label="Harga maksimum">
+          </div>
+        </div>
+        <div>
+          <h3>Kondisi</h3>
+          <label><input type="checkbox" checked> Seperti baru</label>
+          <label><input type="checkbox"> Bekas — mulus</label>
+          <label><input type="checkbox"> Bekas — wajar</label>
+          <label><input type="checkbox"> Rusak / untuk suku cadang</label>
+        </div>
+        <div>
+          <h3>Lokasi</h3>
+          <label><input type="radio" name="lok" checked> Cirebon &amp; sekitar</label>
+          <label><input type="radio" name="lok"> Jawa Barat</label>
+          <label><input type="radio" name="lok"> Seluruh Indonesia</label>
+        </div>
+        <div>
+          <h3>Penjual</h3>
+          <label><input type="checkbox" checked> Identitas terverifikasi</label>
+          <label><input type="checkbox"> Rating 4,5 ke atas</label>
+        </div>
+      </aside>
+
+      <div>
+        <div class="between" style="margin-bottom:16px">
+          <div>
+            <h1>Barang bekas, uang aman</h1>
+            <p class="faint" style="margin:0">Uangmu ditahan sistem sampai barang sampai dan kamu bilang cocok.</p>
+          </div>
+          <select aria-label="Urutkan" style="border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:inherit;font-size:var(--fs-1);background:#fff">
+            <option>Paling baru</option>
+            <option>Harga terendah</option>
+            <option>Harga tertinggi</option>
+            <option>Terdekat</option>
+          </select>
+        </div>
+
+        <div class="grid" id="grid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DETAIL PRODUK ================= -->
+<section class="screen" id="produk">
+  <div class="wrap">
+    <p class="faint" style="margin-bottom:18px">Fotografi › Kamera mirrorless</p>
+    <div class="pdp">
+      <div class="gallery">
+        <div class="main">foto 1 dari 5</div>
+        <div class="strip"><div></div><div></div><div></div><div></div><div></div></div>
+
+        <h2 style="margin-top:34px">Deskripsi</h2>
+        <p>Dipakai dua tahun untuk foto keluarga, jarang dibawa keluar kota. Shutter count 8.400. Body mulus, ada baret halus di bagian bawah (lihat foto 4). LCD dan viewfinder bersih, tidak pernah servis.</p>
+        <p>Termasuk lensa kit 15–45mm, dua baterai, charger, tali, dan tas. Kardus masih ada. Bisa COD di Cirebon kota kalau mau cek dulu.</p>
+
+        <h2 style="margin-top:30px">Spesifikasi</h2>
+        <table class="spec">
+          <tr><td>Kondisi</td><td>Bekas — mulus</td></tr>
+          <tr><td>Tahun beli</td><td>2023</td></tr>
+          <tr><td>Kelengkapan</td><td>Kardus, charger, 2 baterai, tas</td></tr>
+          <tr><td>Garansi</td><td>Habis</td></tr>
+          <tr><td>Lokasi</td><td>Cirebon, Jawa Barat</td></tr>
+        </table>
+      </div>
+
+      <div class="stack">
+        <div>
+          <span class="tag">Bekas — mulus</span>
+          <h1 style="margin:10px 0 4px;font-size:var(--fs-4)">Canon EOS M50 Mark II + lensa kit</h1>
+          <div class="price" style="font-size:var(--fs-5);letter-spacing:-.03em">Rp 4.750.000</div>
+          <p class="faint" style="margin-top:4px">Stok 1 — barang bekas, hanya satu unit</p>
+        </div>
+
+        <div class="note">
+          <p><strong>Dilindungi rekening bersama.</strong> Pembayaranmu ditahan Bekas.id. Penjual baru menerima uangnya setelah kamu konfirmasi barang diterima dan sesuai.</p>
+        </div>
+
+        <button class="btn block">Beli dengan rekening bersama</button>
+        <button class="btn ghost block">Tanya penjual</button>
+        <button class="btn quiet block">Simpan ke wishlist</button>
+
+        <div class="card pad">
+          <div class="seller">
+            <div class="ava"></div>
+            <div>
+              <div style="font-weight:600;font-size:var(--fs-1)">Dimas Prakoso</div>
+              <div class="tiny">Bergabung 2024 · 38 transaksi selesai</div>
+            </div>
+          </div>
+          <hr>
+          <div class="between"><span class="faint">Rating penjual</span><strong>4,9 / 5</strong></div>
+          <div class="between" style="margin-top:6px"><span class="faint">Balas chat</span><strong>±12 menit</strong></div>
+          <div class="between" style="margin-top:6px"><span class="faint">Identitas</span><span class="tag hold">Terverifikasi</span></div>
+        </div>
+
+        <div class="card pad">
+          <h3>Kalau barang tidak sesuai</h3>
+          <p class="faint" style="margin:0">Ajukan sengketa maksimal 2 hari setelah barang diterima. Dana tetap ditahan sampai tim kami memutuskan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHECKOUT ================= -->
+<section class="screen" id="checkout">
+  <div class="wrap">
+    <h1>Checkout</h1>
+    <p class="sub">Satu barang, satu penjual. Dana ditahan sampai kamu konfirmasi.</p>
+
+    <div class="co">
+      <div class="stack">
+        <div class="card pad">
+          <h2>Alamat pengiriman</h2>
+          <div class="opt" data-sel="1">
+            <input type="radio" name="alamat" checked>
+            <div>
+              <div style="font-weight:600;font-size:var(--fs-1)">Rumah — Rani Ayuningtyas</div>
+              <div class="faint">Jl. Kesambi Raya No. 24, Kesambi, Kota Cirebon, Jawa Barat 45134 · 0812-3456-7890</div>
+            </div>
+          </div>
+          <div class="opt">
+            <input type="radio" name="alamat">
+            <div>
+              <div style="font-weight:600;font-size:var(--fs-1)">Kantor — Rani Ayuningtyas</div>
+              <div class="faint">Jl. Cipto Mangunkusumo No. 8, Pekiringan, Kota Cirebon, Jawa Barat 45131</div>
+            </div>
+          </div>
+          <button class="btn quiet" style="margin-top:6px">Tambah alamat baru</button>
+        </div>
+
+        <div class="card pad">
+          <h2>Pengiriman</h2>
+          <div class="opt" data-sel="1">
+            <input type="radio" name="kirim" checked>
+            <div class="between" style="width:100%">
+              <div>
+                <div style="font-weight:600;font-size:var(--fs-1)">Reguler — 2–3 hari</div>
+                <div class="faint">Wajib pakai resi supaya escrow bisa melacak</div>
+              </div>
+              <strong>Rp 22.000</strong>
+            </div>
+          </div>
+          <div class="opt">
+            <input type="radio" name="kirim">
+            <div class="between" style="width:100%">
+              <div>
+                <div style="font-weight:600;font-size:var(--fs-1)">Kargo hemat — 4–6 hari</div>
+                <div class="faint">Lebih murah, tanpa asuransi</div>
+              </div>
+              <strong>Rp 14.000</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="card pad">
+          <h2>Bayar pakai</h2>
+          <div class="opt" data-sel="1">
+            <input type="radio" name="bayar" checked>
+            <div>
+              <div style="font-weight:600;font-size:var(--fs-1)">Transfer bank (Virtual Account)</div>
+              <div class="faint">BCA, Mandiri, BNI, BRI, Permata</div>
+            </div>
+          </div>
+          <div class="opt">
+            <input type="radio" name="bayar">
+            <div>
+              <div style="font-weight:600;font-size:var(--fs-1)">QRIS</div>
+              <div class="faint">GoPay, OVO, Dana, ShopeePay, m-banking</div>
+            </div>
+          </div>
+          <div class="opt">
+            <input type="radio" name="bayar">
+            <div>
+              <div style="font-weight:600;font-size:var(--fs-1)">Saldo Bekas.id</div>
+              <div class="faint">Saldo tersedia Rp 310.000 — kurang Rp 4.462.000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card pad">
+          <h2>Ringkasan</h2>
+          <div class="row" style="align-items:flex-start">
+            <div class="thumb" style="width:64px;height:64px;flex:none;border-radius:8px;aspect-ratio:auto"></div>
+            <div>
+              <div class="pname">Canon EOS M50 Mark II + lensa kit</div>
+              <div class="tiny">Dimas Prakoso · Cirebon</div>
+            </div>
+          </div>
+          <hr>
+          <table class="sum" style="width:100%">
+            <tr><td class="muted">Harga barang</td><td>Rp 4.750.000</td></tr>
+            <tr><td class="muted">Ongkos kirim</td><td>Rp 22.000</td></tr>
+            <tr><td class="muted">Biaya rekening bersama (1%)</td><td>Rp 47.500</td></tr>
+            <tr><td>Total bayar</td><td>Rp 4.819.500</td></tr>
+          </table>
+        </div>
+
+        <div class="note">
+          <p><strong>Uangmu ditahan, bukan langsung ke penjual.</strong> Kami teruskan ke Dimas setelah kamu konfirmasi barang diterima, atau otomatis 3 hari setelah paket sampai kalau kamu tidak merespons.</p>
+        </div>
+
+        <button class="btn block">Bayar Rp 4.819.500</button>
+        <p class="tiny" style="text-align:center">Dengan membayar, kamu setuju pada syarat rekening bersama.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PESANAN & ESCROW ================= -->
+<section class="screen" id="pesanan">
+  <div class="wrap">
+    <div class="between" style="margin-bottom:6px">
+      <h1 style="margin:0">Pesanan #ORD-2409-0183</h1>
+      <span class="tag hold">Dana ditahan</span>
+    </div>
+    <p class="sub">Dibuat 14 September 2026, 09.41</p>
+
+    <div class="split">
+      <div class="stack">
+        <div class="escrow">
+          <div class="escrow-head">
+            <div class="tiny" style="color:var(--hold);margin-bottom:2px">Ditahan Bekas.id</div>
+            <div class="escrow-amt">Rp 4.772.000</div>
+            <div class="faint" style="margin-top:4px">Akan diteruskan ke Dimas Prakoso setelah kamu konfirmasi</div>
+          </div>
+          <ol class="ladder">
+            <li class="done">
+              <span class="mark"></span>
+              <span><span class="t">Pembayaran diterima</span><br><span class="d">Virtual Account BCA · Rp 4.819.500</span></span>
+              <span class="stamp">14 Sep, 09.48</span>
+            </li>
+            <li class="done">
+              <span class="mark"></span>
+              <span><span class="t">Penjual menerima pesanan</span><br><span class="d">Dimas menyiapkan barang</span></span>
+              <span class="stamp">14 Sep, 11.02</span>
+            </li>
+            <li class="done">
+              <span class="mark"></span>
+              <span><span class="t">Barang dikirim</span><br><span class="d">JNE · resi JP4820193847 — lacak</span></span>
+              <span class="stamp">15 Sep, 08.20</span>
+            </li>
+            <li class="now">
+              <span class="mark"></span>
+              <span><span class="t">Barang sampai — tunggu konfirmasi kamu</span><br><span class="d">Otomatis diteruskan ke penjual 19 Sep, 14.30 kalau tidak ada kabar</span></span>
+              <span class="stamp">16 Sep, 14.30</span>
+            </li>
+            <li>
+              <span class="mark"></span>
+              <span><span class="t">Dana diteruskan ke penjual</span><br><span class="d">Masuk ke saldo penjual, bisa dicairkan</span></span>
+              <span class="stamp">—</span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="card pad">
+          <h2>Cek barangnya dulu</h2>
+          <p class="faint">Buka paketnya, pastikan barang sesuai deskripsi. Kalau sudah cocok, konfirmasi supaya Dimas menerima uangnya.</p>
+          <div class="row" style="flex-wrap:wrap;margin-top:14px">
+            <button class="btn">Barang sesuai, teruskan dana</button>
+            <button class="btn ghost">Ajukan sengketa</button>
+          </div>
+        </div>
+
+        <div class="note warn">
+          <p>Sisa waktu konfirmasi <strong>2 hari 23 jam</strong>. Lewat itu dana diteruskan otomatis dan sengketa tidak bisa diajukan lagi.</p>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card pad">
+          <h3>Barang</h3>
+          <div class="row" style="align-items:flex-start;margin-top:10px">
+            <div class="thumb" style="width:60px;height:60px;flex:none;border-radius:8px;aspect-ratio:auto"></div>
+            <div>
+              <div class="pname">Canon EOS M50 Mark II + lensa kit</div>
+              <div class="price" style="font-size:var(--fs-1);margin-top:2px">Rp 4.750.000</div>
+            </div>
+          </div>
+          <hr>
+          <div class="between"><span class="faint">Penjual</span><strong style="font-size:var(--fs-1)">Dimas Prakoso</strong></div>
+          <div class="between" style="margin-top:6px"><span class="faint">Kurir</span><strong style="font-size:var(--fs-1)">JNE Reguler</strong></div>
+          <div class="between" style="margin-top:6px"><span class="faint">Tujuan</span><strong style="font-size:var(--fs-1)">Kesambi, Cirebon</strong></div>
+          <hr>
+          <button class="btn quiet block">Chat penjual</button>
+        </div>
+
+        <div class="card pad">
+          <h3>Rincian pembayaran</h3>
+          <table class="sum" style="width:100%;margin-top:6px">
+            <tr><td class="muted">Harga barang</td><td>Rp 4.750.000</td></tr>
+            <tr><td class="muted">Ongkos kirim</td><td>Rp 22.000</td></tr>
+            <tr><td class="muted">Biaya rekber</td><td>Rp 47.500</td></tr>
+            <tr><td>Dibayar</td><td>Rp 4.819.500</td></tr>
+          </table>
+          <p class="tiny" style="margin-top:10px">Yang ditahan Rp 4.772.000 — biaya rekber sudah dipotong di awal.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHAT ================= -->
+<section class="screen" id="chat">
+  <div class="wrap">
+    <h1>Chat</h1>
+    <p class="sub">Nego, tanya kondisi barang, dan minta foto tambahan sebelum beli.</p>
+    <div class="chat">
+      <div class="rooms">
+        <div class="room" data-sel="1">
+          <div class="ava" style="width:38px;height:38px"></div>
+          <div style="min-width:0">
+            <div class="nm">Dimas Prakoso</div>
+            <div class="pv">Siap, saya kirim besok pagi ya</div>
+          </div>
+        </div>
+        <div class="room">
+          <div class="ava" style="width:38px;height:38px"></div>
+          <div style="min-width:0">
+            <div class="nm">Sinta Wulandari</div>
+            <div class="pv">Sepedanya masih ada kak?</div>
+          </div>
+        </div>
+        <div class="room">
+          <div class="ava" style="width:38px;height:38px"></div>
+          <div style="min-width:0">
+            <div class="nm">Bagas Herlambang</div>
+            <div class="pv">Bisa kurang 50 ribu?</div>
+          </div>
+        </div>
+        <div class="room">
+          <div class="ava" style="width:38px;height:38px"></div>
+          <div style="min-width:0">
+            <div class="nm">Putri Maharani</div>
+            <div class="pv">Makasih kak, barangnya mulus</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="thread">
+        <div class="thread-head">
+          <div>
+            <div style="font-weight:600;font-size:var(--fs-1)">Dimas Prakoso</div>
+            <div class="tiny">Canon EOS M50 Mark II — Rp 4.750.000</div>
+          </div>
+          <span class="tag hold">Pesanan aktif</span>
+        </div>
+        <div class="msgs">
+          <div class="sysmsg">Percakapan dimulai dari halaman produk</div>
+          <div class="msg">Halo kak, kameranya masih ada?<span class="ts">09.02</span></div>
+          <div class="msg me">Masih kak. Shutter count 8.400, body mulus<span class="ts">09.05</span></div>
+          <div class="msg">Boleh minta foto bagian bawah yang ada baretnya?<span class="ts">09.06</span></div>
+          <div class="msg me">Sudah saya tambahkan di foto ke-4 ya<span class="ts">09.14</span></div>
+          <div class="sysmsg">Pesanan #ORD-2409-0183 dibuat — dana ditahan Bekas.id</div>
+          <div class="msg">Sudah saya bayar kak<span class="ts">09.49</span></div>
+          <div class="msg me">Siap, saya kirim besok pagi ya<span class="ts">09.51</span></div>
+        </div>
+        <div class="composer">
+          <input type="text" placeholder="Tulis pesan" aria-label="Tulis pesan">
+          <button class="btn">Kirim</button>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:18px">
+      <p>Jangan transfer langsung ke rekening pribadi. Transaksi di luar Bekas.id tidak bisa kami bantu kalau bermasalah.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DOMPET PENJUAL ================= -->
+<section class="screen" id="dompet">
+  <div class="wrap">
+    <h1>Dompet penjual</h1>
+    <p class="sub">Uang dari pesanan yang sudah dikonfirmasi pembeli masuk ke sini.</p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="n">Rp 1.240.000</div>
+        <div class="l">Saldo tersedia — bisa dicairkan</div>
+      </div>
+      <div class="stat accent">
+        <div class="n">Rp 6.112.000</div>
+        <div class="l">Ditahan di 3 pesanan berjalan</div>
+      </div>
+      <div class="stat">
+        <div class="n">Rp 400.000</div>
+        <div class="l">Pencairan diproses</div>
+      </div>
+      <div class="stat">
+        <div class="n">38</div>
+        <div class="l">Transaksi selesai</div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="card">
+        <div class="pad" style="padding-bottom:4px"><h2 style="margin:0">Riwayat</h2></div>
+        <table class="data">
+          <thead>
+            <tr><th>Keterangan</th><th>Pesanan</th><th>Status</th><th style="text-align:right">Jumlah</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dana masuk dari pembeli<div class="tiny">16 Sep 2026</div></td>
+              <td class="faint">#ORD-2409-0177</td>
+              <td><span class="tag hold">Masuk saldo</span></td>
+              <td style="text-align:right;font-weight:600">+ Rp 890.000</td>
+            </tr>
+            <tr>
+              <td>Pencairan ke BCA ••4471<div class="tiny">15 Sep 2026</div></td>
+              <td class="faint">—</td>
+              <td><span class="tag warn">Diproses</span></td>
+              <td style="text-align:right;font-weight:600">− Rp 400.000</td>
+            </tr>
+            <tr>
+              <td>Pembeli belum konfirmasi<div class="tiny">15 Sep 2026</div></td>
+              <td class="faint">#ORD-2409-0183</td>
+              <td><span class="tag">Ditahan</span></td>
+              <td style="text-align:right;font-weight:600">Rp 4.772.000</td>
+            </tr>
+            <tr>
+              <td>Dana dikembalikan ke pembeli<div class="tiny">11 Sep 2026</div></td>
+              <td class="faint">#ORD-2409-0154</td>
+              <td><span class="tag stop">Sengketa kalah</span></td>
+              <td style="text-align:right;font-weight:600">− Rp 620.000</td>
+            </tr>
+            <tr>
+              <td>Dana masuk dari pembeli<div class="tiny">09 Sep 2026</div></td>
+              <td class="faint">#ORD-2409-0141</td>
+              <td><span class="tag hold">Masuk saldo</span></td>
+              <td style="text-align:right;font-weight:600">+ Rp 350.000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="stack">
+        <div class="card pad">
+          <h2>Cairkan dana</h2>
+          <div class="field">
+            <label for="jml">Jumlah</label>
+            <input id="jml" type="text" value="Rp 1.240.000">
+            <div class="tiny" style="margin-top:5px">Minimal Rp 50.000 · biaya admin Rp 4.000</div>
+          </div>
+          <div class="field">
+            <label for="rek">Rekening tujuan</label>
+            <select id="rek">
+              <option>BCA ••4471 — Dimas Prakoso</option>
+              <option>Mandiri ••8820 — Dimas Prakoso</option>
+            </select>
+          </div>
+          <button class="btn block">Cairkan ke rekening</button>
+          <p class="tiny" style="margin-top:10px">Pencairan diproses 1×24 jam pada hari kerja.</p>
+        </div>
+
+        <div class="note warn">
+          <p>Dana dari pesanan berjalan belum bisa dicairkan sampai pembeli konfirmasi atau masa konfirmasi habis.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ADMIN — SENGKETA ================= -->
+<section class="screen" id="sengketa">
+  <div class="wrap">
+    <div class="between" style="margin-bottom:6px">
+      <h1 style="margin:0">Sengketa #DSP-0042</h1>
+      <span class="tag stop">Menunggu putusan</span>
+    </div>
+    <p class="sub">Diajukan pembeli 16 September 2026, 16.12 · pesanan #ORD-2409-0183</p>
+
+    <div class="split">
+      <div class="stack">
+        <div class="note stop">
+          <p><strong>Rp 4.772.000 masih ditahan.</strong> Tidak ada dana yang bergerak sampai kasus ini diputuskan.</p>
+        </div>
+
+        <div class="card pad">
+          <h2>Keluhan pembeli</h2>
+          <p class="faint" style="margin-bottom:4px">Rani Ayuningtyas — alasan: barang tidak sesuai deskripsi</p>
+          <p>Di deskripsi tertulis shutter count 8.400, tapi waktu saya cek di menu kamera angkanya 41.200. Baret di body juga lebih banyak dari foto. Saya minta pengembalian dana penuh.</p>
+          <div class="row" style="margin-top:12px">
+            <div class="thumb" style="width:84px;height:84px;border-radius:8px;aspect-ratio:auto">bukti 1</div>
+            <div class="thumb" style="width:84px;height:84px;border-radius:8px;aspect-ratio:auto">bukti 2</div>
+            <div class="thumb" style="width:84px;height:84px;border-radius:8px;aspect-ratio:auto">bukti 3</div>
+          </div>
+        </div>
+
+        <div class="card pad">
+          <h2>Jawaban penjual</h2>
+          <p class="faint" style="margin-bottom:4px">Dimas Prakoso — dijawab 16 September 2026, 18.40</p>
+          <p>Saya cek shutter count terakhir bulan Juli dan memang 8.400. Baret bawah sudah saya foto di foto ke-4. Saya bersedia potong harga Rp 500.000 kalau pembeli mau tetap lanjut.</p>
+          <div class="row" style="margin-top:12px">
+            <div class="thumb" style="width:84px;height:84px;border-radius:8px;aspect-ratio:auto">bukti 1</div>
+            <div class="thumb" style="width:84px;height:84px;border-radius:8px;aspect-ratio:auto">bukti 2</div>
+          </div>
+        </div>
+
+        <div class="card pad">
+          <h2>Putusan</h2>
+          <div class="opt" data-sel="1">
+            <input type="radio" name="putusan" checked>
+            <div>
+              <div style="font-weight:600;font-size:var(--fs-1)">Kembalikan penuh ke pembeli</div>
+              <div class="faint">Rp 4.772.000 kembali ke Rani. Barang dikirim balik ke penjual, ongkir ditanggung penjual.</div>
+            </div>
+          </div>
+          <div class="opt">
+            <input type="radio" name="putusan">
+            <div>
+              <div style="font-weight:600;font-size:var(--fs-1)">Teruskan penuh ke penjual</div>
+              <div class="faint">Keluhan tidak terbukti. Rp 4.772.000 masuk saldo Dimas.</div>
+            </div>
+          </div>
+          <div class="opt">
+            <input type="radio" name="putusan">
+            <div>
+              <div style="font-weight:600;font-size:var(--fs-1)">Bagi dana</div>
+              <div class="faint">Sebagian ke pembeli, sisanya ke penjual — pakai kalau kedua pihak sama-sama salah.</div>
+            </div>
+          </div>
+          <div class="field" style="margin-top:14px">
+            <label for="alasan">Alasan putusan — dikirim ke kedua pihak</label>
+            <textarea id="alasan" rows="3" placeholder="Tulis alasan yang bisa dibaca pembeli dan penjual"></textarea>
+          </div>
+          <button class="btn">Putuskan dan jalankan</button>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card pad">
+          <h3>Ringkas kasus</h3>
+          <hr>
+          <div class="between"><span class="faint">Nilai ditahan</span><strong style="font-size:var(--fs-1)">Rp 4.772.000</strong></div>
+          <div class="between" style="margin-top:6px"><span class="faint">Diajukan</span><strong style="font-size:var(--fs-1)">2 jam lalu</strong></div>
+          <div class="between" style="margin-top:6px"><span class="faint">Batas putusan</span><strong style="font-size:var(--fs-1)">3 hari lagi</strong></div>
+        </div>
+
+        <div class="card pad">
+          <h3>Rekam jejak</h3>
+          <hr>
+          <div class="between"><span class="faint">Pembeli</span><span>0 sengketa sebelumnya</span></div>
+          <div class="between" style="margin-top:6px"><span class="faint">Penjual</span><span>1 dari 38 transaksi</span></div>
+          <div class="between" style="margin-top:6px"><span class="faint">Chat</span><a href="#" style="font-size:var(--fs-1)">Buka riwayat</a></div>
+        </div>
+
+        <div class="note">
+          <p>Semua tindakan admin di halaman ini dicatat di log audit lengkap dengan nama admin dan waktunya.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
